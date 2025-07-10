@@ -47,8 +47,18 @@
 <body>
     <div id="container">
         <div id="info">
-            <h3>KFC Restaurant 3D Model</h3>
-            <p>Built with Three.js</p>
+            <h3>🍗 KFC Restaurant 3D Model</h3>
+            <p><strong>Complete KFC Experience:</strong></p>
+            <ul style="font-size: 12px; margin: 5px 0;">
+                <li>✅ Drive-thru with menu board</li>
+                <li>✅ Colonel Sanders portrait</li>
+                <li>✅ KFC bucket logo & signage</li>
+                <li>✅ Outdoor seating area</li>
+                <li>✅ Delivery truck</li>
+                <li>✅ Customer parking</li>
+                <li>✅ Realistic lighting</li>
+            </ul>
+            <p style="font-size: 11px; color: #ccc;">Built with Three.js</p>
         </div>
         <div id="controls">
             <p>Controls:</p>
@@ -164,7 +174,7 @@
             mainBuilding.receiveShadow = true;
             buildingGroup.add(mainBuilding);
             
-            // Red accent walls
+            // Red accent walls with KFC branding
             const redWallGeometry = new THREE.BoxGeometry(20.2, 8, 2);
             const redWallMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
             
@@ -176,7 +186,7 @@
             sideRedWall.position.set(11, 4, 0);
             buildingGroup.add(sideRedWall);
             
-            // Roof
+            // Roof with distinctive KFC styling
             const roofGeometry = new THREE.BoxGeometry(22, 0.5, 14);
             const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x8b0000 });
             const roof = new THREE.Mesh(roofGeometry, roofMaterial);
@@ -191,6 +201,11 @@
             overhang.position.set(0, 8.2, 8);
             buildingGroup.add(overhang);
             
+            // Side overhang for drive-thru
+            const sideOverhang = new THREE.Mesh(new THREE.BoxGeometry(3, 0.3, 16), overhangMaterial);
+            sideOverhang.position.set(12, 8.2, 0);
+            buildingGroup.add(sideOverhang);
+            
             // Windows
             createWindows(buildingGroup);
             
@@ -202,6 +217,15 @@
             
             // Colonel Sanders portrait
             createColonelPortrait(buildingGroup);
+            
+            // Drive-thru window
+            createDriveThru(buildingGroup);
+            
+            // Menu boards
+            createMenuBoards(buildingGroup);
+            
+            // Additional KFC details
+            createKFCDetails(buildingGroup);
             
             scene.add(buildingGroup);
         }
@@ -233,45 +257,414 @@
         }
 
         function createEntrance(buildingGroup) {
-            // Entrance door
-            const doorGeometry = new THREE.BoxGeometry(2, 6, 0.2);
-            const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
-            const door = new THREE.Mesh(doorGeometry, doorMaterial);
-            door.position.set(6, 3, 6.1);
-            buildingGroup.add(door);
+            // Double entrance doors
+            const doorGeometry = new THREE.BoxGeometry(1.8, 6, 0.2);
+            const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
             
-            // Door handle
-            const handleGeometry = new THREE.SphereGeometry(0.1);
+            const leftDoor = new THREE.Mesh(doorGeometry, doorMaterial);
+            leftDoor.position.set(5, 3, 6.1);
+            buildingGroup.add(leftDoor);
+            
+            const rightDoor = new THREE.Mesh(doorGeometry, doorMaterial);
+            rightDoor.position.set(7, 3, 6.1);
+            buildingGroup.add(rightDoor);
+            
+            // Door handles
+            const handleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 0.3);
             const handleMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
-            const handle = new THREE.Mesh(handleGeometry, handleMaterial);
-            handle.position.set(6.8, 3, 6.2);
-            buildingGroup.add(handle);
+            
+            const leftHandle = new THREE.Mesh(handleGeometry, handleMaterial);
+            leftHandle.position.set(5.8, 3, 6.25);
+            leftHandle.rotation.z = Math.PI / 2;
+            buildingGroup.add(leftHandle);
+            
+            const rightHandle = new THREE.Mesh(handleGeometry, handleMaterial);
+            rightHandle.position.set(6.2, 3, 6.25);
+            rightHandle.rotation.z = Math.PI / 2;
+            buildingGroup.add(rightHandle);
+            
+            // Glass panels in doors
+            const glassGeometry = new THREE.PlaneGeometry(1.4, 4);
+            const glassMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x87ceeb, 
+                transparent: true, 
+                opacity: 0.6 
+            });
+            
+            const leftGlass = new THREE.Mesh(glassGeometry, glassMaterial);
+            leftGlass.position.set(5, 3.5, 6.15);
+            buildingGroup.add(leftGlass);
+            
+            const rightGlass = new THREE.Mesh(glassGeometry, glassMaterial);
+            rightGlass.position.set(7, 3.5, 6.15);
+            buildingGroup.add(rightGlass);
+            
+            // Welcome mat
+            const matGeometry = new THREE.PlaneGeometry(4, 1.5);
+            const matMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            const mat = new THREE.Mesh(matGeometry, matMaterial);
+            mat.position.set(6, 0.01, 8);
+            mat.rotation.x = -Math.PI / 2;
+            buildingGroup.add(mat);
+            
+            // Entrance steps
+            const stepGeometry = new THREE.BoxGeometry(5, 0.2, 1);
+            const stepMaterial = new THREE.MeshLambertMaterial({ color: 0xcccccc });
+            
+            for (let i = 0; i < 3; i++) {
+                const step = new THREE.Mesh(stepGeometry, stepMaterial);
+                step.position.set(6, 0.1 + i * 0.2, 7 + i * 0.3);
+                buildingGroup.add(step);
+            }
         }
 
         function createKFCSigns(buildingGroup) {
-            // Main KFC sign
-            const signGeometry = new THREE.BoxGeometry(6, 2, 0.3);
+            // Create the big iconic KFC sign
+            createBigKFCSign(buildingGroup);
+            
+            // Main KFC sign with bucket logo (enhanced)
+            const signGeometry = new THREE.BoxGeometry(12, 4, 0.4);
             const signMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
             const mainSign = new THREE.Mesh(signGeometry, signMaterial);
-            mainSign.position.set(-6, 6, 6.2);
+            mainSign.position.set(-3, 7, 6.2);
             buildingGroup.add(mainSign);
             
-            // KFC text (simplified as white rectangles)
-            const textGeometry = new THREE.PlaneGeometry(1, 1);
+            // KFC text (larger white letters on red background)
+            const textGeometry = new THREE.PlaneGeometry(1.8, 2.2);
             const textMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
             
             const letters = ['K', 'F', 'C'];
             for (let i = 0; i < letters.length; i++) {
                 const letter = new THREE.Mesh(textGeometry, textMaterial);
-                letter.position.set(-7 + i * 1.5, 6, 6.25);
+                letter.position.set(-6 + i * 2.5, 7, 6.25);
                 buildingGroup.add(letter);
             }
             
-            // Side KFC sign
+            // Enhanced KFC Bucket logo
+            const bucketGeometry = new THREE.CylinderGeometry(1.2, 1, 1.8, 12);
+            const bucketMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const bucket = new THREE.Mesh(bucketGeometry, bucketMaterial);
+            bucket.position.set(2, 7, 6.3);
+            bucket.name = 'kfcBucket';
+            buildingGroup.add(bucket);
+            
+            // Bucket handle (enhanced)
+            const handleGeometry = new THREE.TorusGeometry(0.6, 0.08, 8, 16);
+            const handleMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const handle = new THREE.Mesh(handleGeometry, handleMaterial);
+            handle.position.set(2, 8.2, 6.3);
+            handle.rotation.x = Math.PI / 2;
+            buildingGroup.add(handle);
+            
+            // Bucket lid details
+            const lidGeometry = new THREE.CylinderGeometry(1.25, 1.25, 0.1, 12);
+            const lidMaterial = new THREE.MeshLambertMaterial({ color: 0xe5e5e5 });
+            const lid = new THREE.Mesh(lidGeometry, lidMaterial);
+            lid.position.set(2, 7.95, 6.3);
+            buildingGroup.add(lid);
+            
+            // Side KFC sign (enhanced)
             const sideSign = new THREE.Mesh(signGeometry, signMaterial);
-            sideSign.position.set(10.2, 6, 0);
+            sideSign.position.set(10.2, 7, 0);
             sideSign.rotation.y = Math.PI / 2;
             buildingGroup.add(sideSign);
+            
+            // Side KFC letters (enhanced)
+            for (let i = 0; i < letters.length; i++) {
+                const letter = new THREE.Mesh(textGeometry, textMaterial);
+                letter.position.set(10.25, 7, -3 + i * 2.5);
+                letter.rotation.y = Math.PI / 2;
+                buildingGroup.add(letter);
+            }
+            
+            // "It's Finger Lickin' Good!" slogan (enhanced)
+            const sloganGeometry = new THREE.PlaneGeometry(10, 1.2);
+            const sloganMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const slogan = new THREE.Mesh(sloganGeometry, sloganMaterial);
+            slogan.position.set(-3, 5.5, 6.25);
+            buildingGroup.add(slogan);
+            
+            // "Open" sign with glow effect
+            const openSignGeometry = new THREE.PlaneGeometry(2, 1);
+            const openSignMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x00ff00, 
+                emissive: 0x004400 
+            });
+            const openSign = new THREE.Mesh(openSignGeometry, openSignMaterial);
+            openSign.position.set(6, 3.5, 6.25);
+            buildingGroup.add(openSign);
+            
+            // Add LED strip lighting around signs
+            createSignLighting(buildingGroup);
+        }
+
+        function createBigKFCSign(buildingGroup) {
+            // Tall pole for the big sign
+            const poleGeometry = new THREE.CylinderGeometry(0.3, 0.3, 15);
+            const poleMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+            const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+            pole.position.set(-20, 7.5, 5);
+            pole.castShadow = true;
+            buildingGroup.add(pole);
+            
+            // Big KFC sign background (made taller for big text)
+            const bigSignGeometry = new THREE.BoxGeometry(10, 8, 0.5);
+            const bigSignMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const bigSign = new THREE.Mesh(bigSignGeometry, bigSignMaterial);
+            bigSign.position.set(-20, 12, 5);
+            buildingGroup.add(bigSign);
+            
+            // White border around the sign
+            const borderGeometry = new THREE.BoxGeometry(10.2, 8.2, 0.3);
+            const borderMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const border = new THREE.Mesh(borderGeometry, borderMaterial);
+            border.position.set(-20, 12, 4.9);
+            buildingGroup.add(border);
+            
+            // Create big bold "KFC" title
+            createBigKFCTitle(buildingGroup, -20, 14, 5.3);
+            
+            // Giant KFC bucket on the sign (repositioned lower)
+            const giantBucketGeometry = new THREE.CylinderGeometry(1.5, 1.2, 2.5, 16);
+            const giantBucketMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const giantBucket = new THREE.Mesh(giantBucketGeometry, giantBucketMaterial);
+            giantBucket.position.set(-20, 10, 5.3);
+            buildingGroup.add(giantBucket);
+            
+            // Giant bucket handle
+            const giantHandleGeometry = new THREE.TorusGeometry(0.8, 0.12, 8, 16);
+            const giantHandleMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const giantHandle = new THREE.Mesh(giantHandleGeometry, giantHandleMaterial);
+            giantHandle.position.set(-20, 11.3, 5.3);
+            giantHandle.rotation.x = Math.PI / 2;
+            buildingGroup.add(giantHandle);
+            
+            // Giant bucket lid
+            const giantLidGeometry = new THREE.CylinderGeometry(1.55, 1.55, 0.15, 16);
+            const giantLidMaterial = new THREE.MeshLambertMaterial({ color: 0xe5e5e5 });
+            const giantLid = new THREE.Mesh(giantLidGeometry, giantLidMaterial);
+            giantLid.position.set(-20, 11.25, 5.3);
+            buildingGroup.add(giantLid);
+            
+            // Colonel Sanders silhouette on the sign (repositioned)
+            const colonelSilhouetteGeometry = new THREE.PlaneGeometry(1.2, 1.8);
+            const colonelSilhouetteMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            const colonelSilhouette = new THREE.Mesh(colonelSilhouetteGeometry, colonelSilhouetteMaterial);
+            colonelSilhouette.position.set(-18, 10, 5.25);
+            buildingGroup.add(colonelSilhouette);
+            
+            // "Since 1952" text (repositioned)
+            const sinceTextGeometry = new THREE.PlaneGeometry(3, 0.5);
+            const sinceTextMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const sinceText = new THREE.Mesh(sinceTextGeometry, sinceTextMaterial);
+            sinceText.position.set(-20, 8.5, 5.25);
+            buildingGroup.add(sinceText);
+            
+            // Add spotlights on the big sign
+            createSignSpotlights(buildingGroup, -20, 12, 5);
+        }
+
+        function createBigKFCTitle(buildingGroup, x, y, z) {
+            // Create large, bold "KFC" letters
+            const letterWidth = 2.5;
+            const letterHeight = 3.5;
+            const letterDepth = 0.3;
+            
+            // Letter K
+            const kGroup = new THREE.Group();
+            
+            // K - Main vertical line
+            const kVerticalGeometry = new THREE.BoxGeometry(0.5, letterHeight, letterDepth);
+            const kVerticalMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const kVertical = new THREE.Mesh(kVerticalGeometry, kVerticalMaterial);
+            kVertical.position.set(-1, 0, 0);
+            kGroup.add(kVertical);
+            
+            // K - Upper diagonal
+            const kUpperGeometry = new THREE.BoxGeometry(1.5, 0.5, letterDepth);
+            const kUpper = new THREE.Mesh(kUpperGeometry, kVerticalMaterial);
+            kUpper.position.set(0, 0.8, 0);
+            kUpper.rotation.z = -Math.PI / 6;
+            kGroup.add(kUpper);
+            
+            // K - Lower diagonal
+            const kLowerGeometry = new THREE.BoxGeometry(1.5, 0.5, letterDepth);
+            const kLower = new THREE.Mesh(kLowerGeometry, kVerticalMaterial);
+            kLower.position.set(0, -0.8, 0);
+            kLower.rotation.z = Math.PI / 6;
+            kGroup.add(kLower);
+            
+            kGroup.position.set(x - 3, y, z);
+            buildingGroup.add(kGroup);
+            
+            // Letter F
+            const fGroup = new THREE.Group();
+            
+            // F - Main vertical line
+            const fVerticalGeometry = new THREE.BoxGeometry(0.5, letterHeight, letterDepth);
+            const fVerticalMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const fVertical = new THREE.Mesh(fVerticalGeometry, fVerticalMaterial);
+            fVertical.position.set(-1, 0, 0);
+            fGroup.add(fVertical);
+            
+            // F - Top horizontal line
+            const fTopGeometry = new THREE.BoxGeometry(2, 0.5, letterDepth);
+            const fTop = new THREE.Mesh(fTopGeometry, fVerticalMaterial);
+            fTop.position.set(0, 1.25, 0);
+            fGroup.add(fTop);
+            
+            // F - Middle horizontal line
+            const fMiddleGeometry = new THREE.BoxGeometry(1.5, 0.5, letterDepth);
+            const fMiddle = new THREE.Mesh(fMiddleGeometry, fVerticalMaterial);
+            fMiddle.position.set(-0.25, 0, 0);
+            fGroup.add(fMiddle);
+            
+            fGroup.position.set(x, y, z);
+            buildingGroup.add(fGroup);
+            
+            // Letter C
+            const cGroup = new THREE.Group();
+            
+            // C - Main curved part (using multiple rectangles to simulate curve)
+            const cMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            
+            // C - Left vertical part
+            const cVerticalGeometry = new THREE.BoxGeometry(0.5, letterHeight * 0.8, letterDepth);
+            const cVertical = new THREE.Mesh(cVerticalGeometry, cMaterial);
+            cVertical.position.set(-1, 0, 0);
+            cGroup.add(cVertical);
+            
+            // C - Top horizontal part
+            const cTopGeometry = new THREE.BoxGeometry(1.5, 0.5, letterDepth);
+            const cTop = new THREE.Mesh(cTopGeometry, cMaterial);
+            cTop.position.set(-0.25, 1.25, 0);
+            cGroup.add(cTop);
+            
+            // C - Bottom horizontal part
+            const cBottomGeometry = new THREE.BoxGeometry(1.5, 0.5, letterDepth);
+            const cBottom = new THREE.Mesh(cBottomGeometry, cMaterial);
+            cBottom.position.set(-0.25, -1.25, 0);
+            cGroup.add(cBottom);
+            
+            cGroup.position.set(x + 3, y, z);
+            buildingGroup.add(cGroup);
+            
+            // Add glow effect around the letters
+            createLetterGlow(buildingGroup, x, y, z);
+        }
+
+        function createLetterGlow(buildingGroup, x, y, z) {
+            // Add glowing outline effect
+            const glowGeometry = new THREE.PlaneGeometry(8, 4);
+            const glowMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff, 
+                transparent: true, 
+                opacity: 0.3,
+                emissive: 0x444444
+            });
+            const glow = new THREE.Mesh(glowGeometry, glowMaterial);
+            glow.position.set(x, y, z - 0.1);
+            buildingGroup.add(glow);
+            
+            // Add LED lights around the letters
+            const ledGeometry = new THREE.SphereGeometry(0.08);
+            const ledMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff, 
+                emissive: 0x888888 
+            });
+            
+            // Create LED border around the KFC text
+            const ledPositions = [
+                // Top row
+                { x: x - 4, y: y + 2, z: z + 0.2 },
+                { x: x - 2, y: y + 2, z: z + 0.2 },
+                { x: x, y: y + 2, z: z + 0.2 },
+                { x: x + 2, y: y + 2, z: z + 0.2 },
+                { x: x + 4, y: y + 2, z: z + 0.2 },
+                // Bottom row
+                { x: x - 4, y: y - 2, z: z + 0.2 },
+                { x: x - 2, y: y - 2, z: z + 0.2 },
+                { x: x, y: y - 2, z: z + 0.2 },
+                { x: x + 2, y: y - 2, z: z + 0.2 },
+                { x: x + 4, y: y - 2, z: z + 0.2 },
+                // Left side
+                { x: x - 4, y: y + 1, z: z + 0.2 },
+                { x: x - 4, y: y, z: z + 0.2 },
+                { x: x - 4, y: y - 1, z: z + 0.2 },
+                // Right side
+                { x: x + 4, y: y + 1, z: z + 0.2 },
+                { x: x + 4, y: y, z: z + 0.2 },
+                { x: x + 4, y: y - 1, z: z + 0.2 }
+            ];
+            
+            ledPositions.forEach(pos => {
+                const led = new THREE.Mesh(ledGeometry, ledMaterial);
+                led.position.set(pos.x, pos.y, pos.z);
+                buildingGroup.add(led);
+            });
+        }
+
+        function createSignLighting(buildingGroup) {
+            // LED strip around main sign
+            const ledGeometry = new THREE.SphereGeometry(0.05);
+            const ledMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff, 
+                emissive: 0x444444 
+            });
+            
+            // Top LED strip
+            for (let i = 0; i < 20; i++) {
+                const led = new THREE.Mesh(ledGeometry, ledMaterial);
+                led.position.set(-9 + i * 0.9, 9.2, 6.3);
+                buildingGroup.add(led);
+            }
+            
+            // Bottom LED strip
+            for (let i = 0; i < 20; i++) {
+                const led = new THREE.Mesh(ledGeometry, ledMaterial);
+                led.position.set(-9 + i * 0.9, 4.8, 6.3);
+                buildingGroup.add(led);
+            }
+            
+            // Side LED strips
+            for (let i = 0; i < 8; i++) {
+                const leftLed = new THREE.Mesh(ledGeometry, ledMaterial);
+                leftLed.position.set(-9.2, 5 + i * 0.5, 6.3);
+                buildingGroup.add(leftLed);
+                
+                const rightLed = new THREE.Mesh(ledGeometry, ledMaterial);
+                rightLed.position.set(9.2, 5 + i * 0.5, 6.3);
+                buildingGroup.add(rightLed);
+            }
+        }
+
+        function createSignSpotlights(buildingGroup, x, y, z) {
+            // Spotlights for the big sign
+            const spotlightGeometry = new THREE.CylinderGeometry(0.2, 0.3, 0.5);
+            const spotlightMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            
+            // Four spotlights around the sign
+            const spotlightPositions = [
+                { x: x - 2, y: y + 4, z: z + 2 },
+                { x: x + 2, y: y + 4, z: z + 2 },
+                { x: x - 2, y: y - 4, z: z + 2 },
+                { x: x + 2, y: y - 4, z: z + 2 }
+            ];
+            
+            spotlightPositions.forEach(pos => {
+                const spotlight = new THREE.Mesh(spotlightGeometry, spotlightMaterial);
+                spotlight.position.set(pos.x, pos.y, pos.z);
+                spotlight.rotation.x = Math.PI / 4;
+                buildingGroup.add(spotlight);
+                
+                // Add light source
+                const spotLight = new THREE.SpotLight(0xffffff, 1, 30, Math.PI / 6, 0.3);
+                spotLight.position.set(pos.x, pos.y, pos.z);
+                spotLight.target.position.set(x, y, z);
+                spotLight.castShadow = true;
+                scene.add(spotLight);
+                scene.add(spotLight.target);
+            });
         }
 
         function createColonelPortrait(buildingGroup) {
@@ -283,13 +676,231 @@
             portrait.rotation.y = Math.PI / 2;
             buildingGroup.add(portrait);
             
+            // Colonel's face (simplified)
+            const faceGeometry = new THREE.PlaneGeometry(2.5, 3.5);
+            const faceMaterial = new THREE.MeshLambertMaterial({ color: 0xfdbcb4 });
+            const face = new THREE.Mesh(faceGeometry, faceMaterial);
+            face.position.set(10.12, 4, 0);
+            face.rotation.y = Math.PI / 2;
+            buildingGroup.add(face);
+            
+            // Beard and mustache
+            const beardGeometry = new THREE.PlaneGeometry(2, 1.5);
+            const beardMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const beard = new THREE.Mesh(beardGeometry, beardMaterial);
+            beard.position.set(10.13, 3.2, 0);
+            beard.rotation.y = Math.PI / 2;
+            buildingGroup.add(beard);
+            
+            // Glasses
+            const glassGeometry = new THREE.RingGeometry(0.3, 0.35, 16);
+            const glassMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            
+            const leftGlass = new THREE.Mesh(glassGeometry, glassMaterial);
+            leftGlass.position.set(10.14, 4.3, -0.4);
+            leftGlass.rotation.y = Math.PI / 2;
+            buildingGroup.add(leftGlass);
+            
+            const rightGlass = new THREE.Mesh(glassGeometry, glassMaterial);
+            rightGlass.position.set(10.14, 4.3, 0.4);
+            rightGlass.rotation.y = Math.PI / 2;
+            buildingGroup.add(rightGlass);
+            
             // Portrait frame
             const frameGeometry = new THREE.BoxGeometry(3.2, 4.2, 0.1);
-            const frameMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            const frameMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
             const frame = new THREE.Mesh(frameGeometry, frameMaterial);
             frame.position.set(10.05, 4, 0);
             frame.rotation.y = Math.PI / 2;
             buildingGroup.add(frame);
+        }
+
+        function createDriveThru(buildingGroup) {
+            // Drive-thru window
+            const windowGeometry = new THREE.PlaneGeometry(2, 1.5);
+            const windowMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x000000, 
+                transparent: true, 
+                opacity: 0.8 
+            });
+            const driveThruWindow = new THREE.Mesh(windowGeometry, windowMaterial);
+            driveThruWindow.position.set(10.1, 3.5, 2);
+            driveThruWindow.rotation.y = Math.PI / 2;
+            buildingGroup.add(driveThruWindow);
+            
+            // Window frame
+            const frameGeometry = new THREE.BoxGeometry(2.2, 1.7, 0.1);
+            const frameMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+            frame.position.set(10.05, 3.5, 2);
+            frame.rotation.y = Math.PI / 2;
+            buildingGroup.add(frame);
+            
+            // Drive-thru sign
+            const signGeometry = new THREE.PlaneGeometry(1.5, 0.8);
+            const signMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const driveThruSign = new THREE.Mesh(signGeometry, signMaterial);
+            driveThruSign.position.set(10.1, 5, 2);
+            driveThruSign.rotation.y = Math.PI / 2;
+            buildingGroup.add(driveThruSign);
+            
+            // "DRIVE THRU" text
+            const textGeometry = new THREE.PlaneGeometry(1.3, 0.6);
+            const textMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const driveThruText = new THREE.Mesh(textGeometry, textMaterial);
+            driveThruText.position.set(10.12, 5, 2);
+            driveThruText.rotation.y = Math.PI / 2;
+            buildingGroup.add(driveThruText);
+            
+            // Drive-thru lane marking
+            const laneGeometry = new THREE.PlaneGeometry(25, 0.3);
+            const laneMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+            const driveLane = new THREE.Mesh(laneGeometry, laneMaterial);
+            driveLane.position.set(12, 0.01, 2);
+            driveLane.rotation.x = -Math.PI / 2;
+            buildingGroup.add(driveLane);
+        }
+
+        function createMenuBoards(buildingGroup) {
+            // Pre-order menu board
+            const menuBoardGeometry = new THREE.BoxGeometry(0.2, 4, 3);
+            const menuBoardMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            const menuBoard = new THREE.Mesh(menuBoardGeometry, menuBoardMaterial);
+            menuBoard.position.set(20, 5, -2);
+            buildingGroup.add(menuBoard);
+            
+            // Menu board screen
+            const screenGeometry = new THREE.PlaneGeometry(2.8, 3.8);
+            const screenMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x001122, 
+                emissive: 0x002244 
+            });
+            const screen = new THREE.Mesh(screenGeometry, screenMaterial);
+            screen.position.set(20.1, 5, -2);
+            screen.rotation.y = Math.PI / 2;
+            buildingGroup.add(screen);
+            
+            // Menu items (simplified rectangles)
+            const itemGeometry = new THREE.PlaneGeometry(0.8, 0.3);
+            const itemMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            
+            const menuItems = [
+                'Original Recipe',
+                'Hot Wings',
+                'Popcorn Chicken',
+                'Zinger Burger',
+                'Family Feast',
+                'Bucket Meal'
+            ];
+            
+            for (let i = 0; i < menuItems.length; i++) {
+                const item = new THREE.Mesh(itemGeometry, itemMaterial);
+                item.position.set(20.12, 6.5 - i * 0.5, -2);
+                item.rotation.y = Math.PI / 2;
+                buildingGroup.add(item);
+            }
+            
+            // Menu board post
+            const postGeometry = new THREE.CylinderGeometry(0.1, 0.1, 5);
+            const postMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+            const post = new THREE.Mesh(postGeometry, postMaterial);
+            post.position.set(20, 2.5, -2);
+            buildingGroup.add(post);
+            
+            // Speaker box
+            const speakerGeometry = new THREE.BoxGeometry(0.5, 0.8, 0.3);
+            const speakerMaterial = new THREE.MeshLambertMaterial({ color: 0x444444 });
+            const speaker = new THREE.Mesh(speakerGeometry, speakerMaterial);
+            speaker.position.set(20, 3.5, -2);
+            buildingGroup.add(speaker);
+        }
+
+        function createKFCDetails(buildingGroup) {
+            // Outdoor seating area
+            const tableGeometry = new THREE.CylinderGeometry(1, 1, 0.1);
+            const tableMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            
+            for (let i = 0; i < 3; i++) {
+                const table = new THREE.Mesh(tableGeometry, tableMaterial);
+                table.position.set(-15 + i * 5, 0.8, 12);
+                buildingGroup.add(table);
+                
+                // Table umbrella
+                const umbrellaGeometry = new THREE.ConeGeometry(1.5, 0.5, 8);
+                const umbrellaMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+                const umbrella = new THREE.Mesh(umbrellaGeometry, umbrellaMaterial);
+                umbrella.position.set(-15 + i * 5, 3, 12);
+                buildingGroup.add(umbrella);
+                
+                // Umbrella pole
+                const poleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 2);
+                const poleMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+                const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+                pole.position.set(-15 + i * 5, 2, 12);
+                buildingGroup.add(pole);
+            }
+            
+            // Trash bins
+            const trashGeometry = new THREE.CylinderGeometry(0.4, 0.4, 1.2);
+            const trashMaterial = new THREE.MeshLambertMaterial({ color: 0x2e8b57 });
+            
+            const trashPositions = [
+                { x: -8, z: 10 },
+                { x: 8, z: 10 },
+                { x: 15, z: 5 }
+            ];
+            
+            trashPositions.forEach(pos => {
+                const trash = new THREE.Mesh(trashGeometry, trashMaterial);
+                trash.position.set(pos.x, 0.6, pos.z);
+                buildingGroup.add(trash);
+            });
+            
+            // KFC Flag
+            const flagPoleGeometry = new THREE.CylinderGeometry(0.05, 0.05, 8);
+            const flagPoleMaterial = new THREE.MeshLambertMaterial({ color: 0x666666 });
+            const flagPole = new THREE.Mesh(flagPoleGeometry, flagPoleMaterial);
+            flagPole.position.set(-12, 4, 4);
+            buildingGroup.add(flagPole);
+            
+            const flagGeometry = new THREE.PlaneGeometry(3, 2);
+            const flagMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const flag = new THREE.Mesh(flagGeometry, flagMaterial);
+            flag.position.set(-10.5, 6.5, 4);
+            buildingGroup.add(flag);
+            
+            // Delivery bike parking
+            const bikeGeometry = new THREE.BoxGeometry(0.8, 0.5, 2);
+            const bikeMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const bike = new THREE.Mesh(bikeGeometry, bikeMaterial);
+            bike.position.set(-18, 0.5, 8);
+            buildingGroup.add(bike);
+            
+            // Air conditioning units
+            const acGeometry = new THREE.BoxGeometry(2, 1, 1);
+            const acMaterial = new THREE.MeshLambertMaterial({ color: 0x888888 });
+            
+            for (let i = 0; i < 2; i++) {
+                const ac = new THREE.Mesh(acGeometry, acMaterial);
+                ac.position.set(-8 + i * 16, 8.8, -2);
+                buildingGroup.add(ac);
+            }
+            
+            // Security cameras
+            const cameraGeometry = new THREE.BoxGeometry(0.2, 0.2, 0.3);
+            const cameraMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            
+            const cameraPositions = [
+                { x: -9, y: 7.5, z: 6 },
+                { x: 9, y: 7.5, z: 6 },
+                { x: 10, y: 7.5, z: 4 }
+            ];
+            
+            cameraPositions.forEach(pos => {
+                const camera = new THREE.Mesh(cameraGeometry, cameraMaterial);
+                camera.position.set(pos.x, pos.y, pos.z);
+                buildingGroup.add(camera);
+            });
         }
 
         function createParkingLights() {
@@ -329,17 +940,20 @@
         }
 
         function createEnvironment() {
-            // Some bushes/landscaping
+            // Landscaping with branded elements
             const bushGeometry = new THREE.SphereGeometry(1, 8, 8);
             const bushMaterial = new THREE.MeshLambertMaterial({ color: 0x228b22 });
             
-            for (let i = 0; i < 8; i++) {
+            // Strategic bush placement around the building
+            const bushPositions = [
+                { x: -12, z: 8 }, { x: -8, z: 8 }, { x: 12, z: 8 },
+                { x: -15, z: -5 }, { x: -15, z: 5 }, { x: 15, z: -8 },
+                { x: 8, z: -8 }, { x: -8, z: -8 }
+            ];
+            
+            bushPositions.forEach(pos => {
                 const bush = new THREE.Mesh(bushGeometry, bushMaterial);
-                bush.position.set(
-                    -15 + Math.random() * 30,
-                    0.5,
-                    -15 + Math.random() * 30
-                );
+                bush.position.set(pos.x, 0.5, pos.z);
                 bush.scale.set(
                     0.5 + Math.random() * 0.5,
                     0.5 + Math.random() * 0.5,
@@ -347,17 +961,119 @@
                 );
                 bush.castShadow = true;
                 scene.add(bush);
-            }
+            });
             
-            // Add some cars in parking lot
-            createCars();
+            // Add more detailed parking lot
+            createParkingLot();
+            
+            // Add KFC delivery trucks
+            createDeliveryTrucks();
+            
+            // Add customer cars
+            createCustomerCars();
+            
+            // Add drive-thru queue area
+            createDriveThruQueue();
         }
 
-        function createCars() {
-            const carBodyGeometry = new THREE.BoxGeometry(4, 1.5, 2);
-            const carColors = [0xff0000, 0x0000ff, 0x000000, 0xffffff, 0x808080];
+        function createParkingLot() {
+            // Parking spaces
+            const spaceGeometry = new THREE.PlaneGeometry(2.5, 5);
+            const spaceMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
             
-            for (let i = 0; i < 5; i++) {
+            // Front parking spaces
+            for (let i = 0; i < 12; i++) {
+                const space = new THREE.Mesh(spaceGeometry, spaceMaterial);
+                space.position.set(-15 + i * 2.5, 0.01, 20);
+                space.rotation.x = -Math.PI / 2;
+                scene.add(space);
+            }
+            
+            // Side parking spaces
+            for (let i = 0; i < 8; i++) {
+                const space = new THREE.Mesh(spaceGeometry, spaceMaterial);
+                space.position.set(25, 0.01, -10 + i * 2.5);
+                space.rotation.x = -Math.PI / 2;
+                space.rotation.z = Math.PI / 2;
+                scene.add(space);
+            }
+            
+            // Handicap spaces
+            const handicapGeometry = new THREE.PlaneGeometry(3, 5);
+            const handicapMaterial = new THREE.MeshLambertMaterial({ color: 0x4169e1 });
+            
+            for (let i = 0; i < 2; i++) {
+                const handicap = new THREE.Mesh(handicapGeometry, handicapMaterial);
+                handicap.position.set(-12 + i * 3.5, 0.01, 15);
+                handicap.rotation.x = -Math.PI / 2;
+                scene.add(handicap);
+            }
+        }
+
+        function createDeliveryTrucks() {
+            // KFC delivery truck
+            const truckGroup = new THREE.Group();
+            
+            // Truck body
+            const truckBodyGeometry = new THREE.BoxGeometry(6, 2.5, 2.5);
+            const truckBodyMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const truckBody = new THREE.Mesh(truckBodyGeometry, truckBodyMaterial);
+            truckBody.position.set(0, 1.5, 0);
+            truckBody.castShadow = true;
+            truckGroup.add(truckBody);
+            
+            // Truck cab
+            const cabGeometry = new THREE.BoxGeometry(2.5, 2, 2.5);
+            const cabMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const cab = new THREE.Mesh(cabGeometry, cabMaterial);
+            cab.position.set(4, 1.5, 0);
+            truckGroup.add(cab);
+            
+            // KFC logo on truck
+            const logoGeometry = new THREE.PlaneGeometry(2, 1);
+            const logoMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const logo = new THREE.Mesh(logoGeometry, logoMaterial);
+            logo.position.set(0, 1.5, 1.3);
+            truckGroup.add(logo);
+            
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.3);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            
+            const wheelPositions = [
+                { x: 2, y: 0.4, z: 1.1 }, { x: 2, y: 0.4, z: -1.1 },
+                { x: -2, y: 0.4, z: 1.1 }, { x: -2, y: 0.4, z: -1.1 },
+                { x: 4, y: 0.4, z: 1.1 }, { x: 4, y: 0.4, z: -1.1 }
+            ];
+            
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.position.set(pos.x, pos.y, pos.z);
+                wheel.rotation.z = Math.PI / 2;
+                truckGroup.add(wheel);
+            });
+            
+            truckGroup.position.set(-25, 0, 5);
+            truckGroup.rotation.y = Math.PI / 4;
+            scene.add(truckGroup);
+        }
+
+        function createCustomerCars() {
+            const carBodyGeometry = new THREE.BoxGeometry(4, 1.5, 2);
+            const carColors = [0xff0000, 0x0000ff, 0x000000, 0xffffff, 0x808080, 0x8b4513, 0x006400];
+            
+            // More variety in parking
+            const carPositions = [
+                { x: -12, z: 18, rot: 0 },
+                { x: -7, z: 18, rot: 0 },
+                { x: -2, z: 18, rot: 0 },
+                { x: 8, z: 18, rot: 0 },
+                { x: 23, z: -8, rot: Math.PI / 2 },
+                { x: 23, z: -3, rot: Math.PI / 2 },
+                { x: 23, z: 2, rot: Math.PI / 2 }
+            ];
+            
+            carPositions.forEach((pos, i) => {
                 const carGroup = new THREE.Group();
                 
                 // Car body
@@ -386,21 +1102,39 @@
                     { x: -1.5, y: 0.3, z: -0.9 }
                 ];
                 
-                wheelPositions.forEach(pos => {
+                wheelPositions.forEach(wheelPos => {
                     const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
-                    wheel.position.set(pos.x, pos.y, pos.z);
+                    wheel.position.set(wheelPos.x, wheelPos.y, wheelPos.z);
                     wheel.rotation.z = Math.PI / 2;
                     carGroup.add(wheel);
                 });
                 
-                // Position cars in parking lot
-                carGroup.position.set(
-                    15 + (i * 2.5),
-                    0,
-                    12
-                );
-                carGroup.rotation.y = Math.PI;
+                carGroup.position.set(pos.x, 0, pos.z);
+                carGroup.rotation.y = pos.rot;
                 scene.add(carGroup);
+            });
+        }
+
+        function createDriveThruQueue() {
+            // Drive-thru queue markers
+            const markerGeometry = new THREE.CylinderGeometry(0.1, 0.1, 0.8);
+            const markerMaterial = new THREE.MeshLambertMaterial({ color: 0xffff00 });
+            
+            for (let i = 0; i < 6; i++) {
+                const marker = new THREE.Mesh(markerGeometry, markerMaterial);
+                marker.position.set(18 + i * 3, 0.4, 2);
+                scene.add(marker);
+            }
+            
+            // Drive-thru directional arrows
+            const arrowGeometry = new THREE.PlaneGeometry(1, 2);
+            const arrowMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            
+            for (let i = 0; i < 3; i++) {
+                const arrow = new THREE.Mesh(arrowGeometry, arrowMaterial);
+                arrow.position.set(20 + i * 5, 0.01, 2);
+                arrow.rotation.x = -Math.PI / 2;
+                scene.add(arrow);
             }
         }
 
@@ -412,6 +1146,12 @@
             // Gentle rotation of the colonel portrait
             if (colonelSign) {
                 colonelSign.rotation.y += 0.001;
+            }
+            
+            // Animated KFC bucket rotation
+            const buckets = scene.getObjectByName('kfcBucket');
+            if (buckets) {
+                buckets.rotation.y += 0.01;
             }
             
             renderer.render(scene, camera);
