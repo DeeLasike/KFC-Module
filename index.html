@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KFC Restaurant - Three.js</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
+            background: linear-gradient(to bottom, #1a237e 0%, #3949ab 50%, #5c6bc0 100%);
+            font-family: 'Arial', sans-serif;
+        }
+        
+        #container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+        }
+        
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            color: white;
+            font-size: 14px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+        
+        #controls {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            color: white;
+            font-size: 12px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 10px;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="info">
+            <h3>KFC Restaurant 3D Model</h3>
+            <p>Built with Three.js</p>
+        </div>
+        <div id="controls">
+            <p>Controls:</p>
+            <p>• Mouse: Rotate camera</p>
+            <p>• Scroll: Zoom in/out</p>
+            <p>• Right click + drag: Pan</p>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script>
+        let scene, camera, renderer, controls;
+        let kfcBuilding, colonelSign, lights = [];
+
+        function init() {
+            // Scene setup
+            scene = new THREE.Scene();
+            scene.fog = new THREE.Fog(0x1a237e, 50, 200);
+            
+            // Camera setup
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+            camera.position.set(30, 15, 30);
+            
+            // Renderer setup
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setClearColor(0x1a237e);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            document.getElementById('container').appendChild(renderer.domElement);
+            
+            // Controls
+            controls = new THREE.OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true;
+            controls.dampingFactor = 0.05;
+            controls.target.set(0, 0, 0);
+            
+            // Lighting
+            setupLighting();
+            
+            // Ground
+            createGround();
+            
+            // KFC Building
+            createKFCBuilding();
+            
+            // Environment
+            createEnvironment();
+            
+            // Animation loop
+            animate();
+        }
+
+        function setupLighting() {
+            // Ambient light
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.3);
+            scene.add(ambientLight);
+            
+            // Main directional light (sun)
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 50, 50);
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 100;
+            directionalLight.shadow.camera.left = -50;
+            directionalLight.shadow.camera.right = 50;
+            directionalLight.shadow.camera.top = 50;
+            directionalLight.shadow.camera.bottom = -50;
+            scene.add(directionalLight);
+            
+            // Evening light
+            const eveningLight = new THREE.DirectionalLight(0xff8c00, 0.4);
+            eveningLight.position.set(-30, 20, -30);
+            scene.add(eveningLight);
+            
+            // Parking lot lights
+            createParkingLights();
+        }
+
+        function createGround() {
+            // Main ground
+            const groundGeometry = new THREE.PlaneGeometry(100, 100);
+            const groundMaterial = new THREE.MeshLambertMaterial({ color: 0x2c2c2c });
+            const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2;
+            ground.receiveShadow = true;
+            scene.add(ground);
+            
+            // Parking lot markings
+            const lineGeometry = new THREE.PlaneGeometry(20, 0.2);
+            const lineMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            
+            for (let i = 0; i < 8; i++) {
+                const line = new THREE.Mesh(lineGeometry, lineMaterial);
+                line.position.set(15 + i * 2.5, 0.01, 15);
+                line.rotation.x = -Math.PI / 2;
+                scene.add(line);
+            }
+        }
+
+        function createKFCBuilding() {
+            const buildingGroup = new THREE.Group();
+            
+            // Main building structure
+            const mainBuildingGeometry = new THREE.BoxGeometry(20, 8, 12);
+            const mainBuildingMaterial = new THREE.MeshLambertMaterial({ color: 0xf5f5f5 });
+            const mainBuilding = new THREE.Mesh(mainBuildingGeometry, mainBuildingMaterial);
+            mainBuilding.position.set(0, 4, 0);
+            mainBuilding.castShadow = true;
+            mainBuilding.receiveShadow = true;
+            buildingGroup.add(mainBuilding);
+            
+            // Red accent walls
+            const redWallGeometry = new THREE.BoxGeometry(20.2, 8, 2);
+            const redWallMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            
+            const frontRedWall = new THREE.Mesh(redWallGeometry, redWallMaterial);
+            frontRedWall.position.set(0, 4, 7);
+            buildingGroup.add(frontRedWall);
+            
+            const sideRedWall = new THREE.Mesh(new THREE.BoxGeometry(2, 8, 12.2), redWallMaterial);
+            sideRedWall.position.set(11, 4, 0);
+            buildingGroup.add(sideRedWall);
+            
+            // Roof
+            const roofGeometry = new THREE.BoxGeometry(22, 0.5, 14);
+            const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x8b0000 });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.set(0, 8.5, 0);
+            roof.castShadow = true;
+            buildingGroup.add(roof);
+            
+            // Roof overhang
+            const overhangGeometry = new THREE.BoxGeometry(24, 0.3, 3);
+            const overhangMaterial = new THREE.MeshLambertMaterial({ color: 0x8b0000 });
+            const overhang = new THREE.Mesh(overhangGeometry, overhangMaterial);
+            overhang.position.set(0, 8.2, 8);
+            buildingGroup.add(overhang);
+            
+            // Windows
+            createWindows(buildingGroup);
+            
+            // Entrance
+            createEntrance(buildingGroup);
+            
+            // KFC Signs
+            createKFCSigns(buildingGroup);
+            
+            // Colonel Sanders portrait
+            createColonelPortrait(buildingGroup);
+            
+            scene.add(buildingGroup);
+        }
+
+        function createWindows(buildingGroup) {
+            const windowGeometry = new THREE.PlaneGeometry(3, 2);
+            const windowMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0x87ceeb, 
+                transparent: true, 
+                opacity: 0.7 
+            });
+            
+            // Front windows
+            for (let i = 0; i < 3; i++) {
+                const window = new THREE.Mesh(windowGeometry, windowMaterial);
+                window.position.set(-6 + i * 4, 4, 6.1);
+                buildingGroup.add(window);
+            }
+            
+            // Window frames
+            const frameGeometry = new THREE.BoxGeometry(3.2, 2.2, 0.1);
+            const frameMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
+            
+            for (let i = 0; i < 3; i++) {
+                const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+                frame.position.set(-6 + i * 4, 4, 6.05);
+                buildingGroup.add(frame);
+            }
+        }
+
+        function createEntrance(buildingGroup) {
+            // Entrance door
+            const doorGeometry = new THREE.BoxGeometry(2, 6, 0.2);
+            const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x8b4513 });
+            const door = new THREE.Mesh(doorGeometry, doorMaterial);
+            door.position.set(6, 3, 6.1);
+            buildingGroup.add(door);
+            
+            // Door handle
+            const handleGeometry = new THREE.SphereGeometry(0.1);
+            const handleMaterial = new THREE.MeshLambertMaterial({ color: 0xffd700 });
+            const handle = new THREE.Mesh(handleGeometry, handleMaterial);
+            handle.position.set(6.8, 3, 6.2);
+            buildingGroup.add(handle);
+        }
+
+        function createKFCSigns(buildingGroup) {
+            // Main KFC sign
+            const signGeometry = new THREE.BoxGeometry(6, 2, 0.3);
+            const signMaterial = new THREE.MeshLambertMaterial({ color: 0xdc143c });
+            const mainSign = new THREE.Mesh(signGeometry, signMaterial);
+            mainSign.position.set(-6, 6, 6.2);
+            buildingGroup.add(mainSign);
+            
+            // KFC text (simplified as white rectangles)
+            const textGeometry = new THREE.PlaneGeometry(1, 1);
+            const textMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            
+            const letters = ['K', 'F', 'C'];
+            for (let i = 0; i < letters.length; i++) {
+                const letter = new THREE.Mesh(textGeometry, textMaterial);
+                letter.position.set(-7 + i * 1.5, 6, 6.25);
+                buildingGroup.add(letter);
+            }
+            
+            // Side KFC sign
+            const sideSign = new THREE.Mesh(signGeometry, signMaterial);
+            sideSign.position.set(10.2, 6, 0);
+            sideSign.rotation.y = Math.PI / 2;
+            buildingGroup.add(sideSign);
+        }
+
+        function createColonelPortrait(buildingGroup) {
+            // Colonel Sanders portrait frame
+            const portraitGeometry = new THREE.PlaneGeometry(3, 4);
+            const portraitMaterial = new THREE.MeshLambertMaterial({ color: 0xffffff });
+            const portrait = new THREE.Mesh(portraitGeometry, portraitMaterial);
+            portrait.position.set(10.1, 4, 0);
+            portrait.rotation.y = Math.PI / 2;
+            buildingGroup.add(portrait);
+            
+            // Portrait frame
+            const frameGeometry = new THREE.BoxGeometry(3.2, 4.2, 0.1);
+            const frameMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+            const frame = new THREE.Mesh(frameGeometry, frameMaterial);
+            frame.position.set(10.05, 4, 0);
+            frame.rotation.y = Math.PI / 2;
+            buildingGroup.add(frame);
+        }
+
+        function createParkingLights() {
+            // Parking lot light poles
+            const poleGeometry = new THREE.CylinderGeometry(0.1, 0.1, 8);
+            const poleMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            
+            const lightGeometry = new THREE.SphereGeometry(0.3);
+            const lightMaterial = new THREE.MeshLambertMaterial({ 
+                color: 0xffffff, 
+                emissive: 0x444444 
+            });
+            
+            const positions = [
+                { x: 25, z: 15 },
+                { x: 25, z: -15 },
+                { x: -25, z: 15 },
+                { x: -25, z: -15 }
+            ];
+            
+            positions.forEach(pos => {
+                const pole = new THREE.Mesh(poleGeometry, poleMaterial);
+                pole.position.set(pos.x, 4, pos.z);
+                pole.castShadow = true;
+                scene.add(pole);
+                
+                const light = new THREE.Mesh(lightGeometry, lightMaterial);
+                light.position.set(pos.x, 8, pos.z);
+                scene.add(light);
+                
+                // Add actual light source
+                const pointLight = new THREE.PointLight(0xffffff, 0.5, 20);
+                pointLight.position.set(pos.x, 8, pos.z);
+                pointLight.castShadow = true;
+                scene.add(pointLight);
+            });
+        }
+
+        function createEnvironment() {
+            // Some bushes/landscaping
+            const bushGeometry = new THREE.SphereGeometry(1, 8, 8);
+            const bushMaterial = new THREE.MeshLambertMaterial({ color: 0x228b22 });
+            
+            for (let i = 0; i < 8; i++) {
+                const bush = new THREE.Mesh(bushGeometry, bushMaterial);
+                bush.position.set(
+                    -15 + Math.random() * 30,
+                    0.5,
+                    -15 + Math.random() * 30
+                );
+                bush.scale.set(
+                    0.5 + Math.random() * 0.5,
+                    0.5 + Math.random() * 0.5,
+                    0.5 + Math.random() * 0.5
+                );
+                bush.castShadow = true;
+                scene.add(bush);
+            }
+            
+            // Add some cars in parking lot
+            createCars();
+        }
+
+        function createCars() {
+            const carBodyGeometry = new THREE.BoxGeometry(4, 1.5, 2);
+            const carColors = [0xff0000, 0x0000ff, 0x000000, 0xffffff, 0x808080];
+            
+            for (let i = 0; i < 5; i++) {
+                const carGroup = new THREE.Group();
+                
+                // Car body
+                const carMaterial = new THREE.MeshLambertMaterial({ 
+                    color: carColors[i % carColors.length] 
+                });
+                const carBody = new THREE.Mesh(carBodyGeometry, carMaterial);
+                carBody.position.set(0, 1, 0);
+                carBody.castShadow = true;
+                carGroup.add(carBody);
+                
+                // Car roof
+                const roofGeometry = new THREE.BoxGeometry(3, 1, 1.8);
+                const carRoof = new THREE.Mesh(roofGeometry, carMaterial);
+                carRoof.position.set(0, 2, 0);
+                carGroup.add(carRoof);
+                
+                // Wheels
+                const wheelGeometry = new THREE.CylinderGeometry(0.3, 0.3, 0.2);
+                const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x000000 });
+                
+                const wheelPositions = [
+                    { x: 1.5, y: 0.3, z: 0.9 },
+                    { x: 1.5, y: 0.3, z: -0.9 },
+                    { x: -1.5, y: 0.3, z: 0.9 },
+                    { x: -1.5, y: 0.3, z: -0.9 }
+                ];
+                
+                wheelPositions.forEach(pos => {
+                    const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                    wheel.position.set(pos.x, pos.y, pos.z);
+                    wheel.rotation.z = Math.PI / 2;
+                    carGroup.add(wheel);
+                });
+                
+                // Position cars in parking lot
+                carGroup.position.set(
+                    15 + (i * 2.5),
+                    0,
+                    12
+                );
+                carGroup.rotation.y = Math.PI;
+                scene.add(carGroup);
+            }
+        }
+
+        function animate() {
+            requestAnimationFrame(animate);
+            
+            controls.update();
+            
+            // Gentle rotation of the colonel portrait
+            if (colonelSign) {
+                colonelSign.rotation.y += 0.001;
+            }
+            
+            renderer.render(scene, camera);
+        }
+
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Event listeners
+        window.addEventListener('resize', onWindowResize);
+        
+        // Initialize the scene
+        init();
+    </script>
+</body>
+</html>
